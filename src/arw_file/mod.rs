@@ -1,6 +1,8 @@
 use std::fs::File;
 
 mod header;
+mod ifd;
+mod byte_orders;
 
 pub fn info(filename: &str) {
     let mut file_handle;
