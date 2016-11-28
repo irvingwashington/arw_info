@@ -6,7 +6,10 @@
 
 use std::io;
 use std::fs::File;
+use std::io::Read;
+use std::fmt;
 
+#[derive(PartialEq)]
 enum ByteOrders {
   LittleEndian,
   BigEndian
@@ -26,9 +29,34 @@ pub struct Header {
 }
 
 impl Header {
-  pub fn new(f: &File) -> Header {
-    let mut buf = [0; 10];
-    (*f).read(&buf);
-    Header { byte_order: ByteOrders::LittleEndian, magic_number: 42, ifd_offset: 11 }
+  pub fn new(f: & mut File) -> Header {
+    let mut buf = vec![0; 10];
+
+    match (*f).read(&mut buf) {
+      Ok(n) => { if n < 10 { panic!("Header incomplete"); } },
+      Err(e) => panic!("Error {}", e),
+    }
+
+    let byte_order = if buf[0] == buf[1] && buf[1] == 73 {
+      ByteOrders::LittleEndian
+    } else if buf[0] == buf[1] && buf[1] == 77 {
+      ByteOrders::BigEndian
+    } else {
+      panic!("Header byte order unknown!");
+    };
+
+
+    Header { byte_order: byte_order, magic_number: 42, ifd_offset: 11 }
+  }
+}
+
+impl fmt::Display for Header {
+  fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+    let be_str = if self.byte_order == ByteOrders::LittleEndian {
+      "LE"
+    } else {
+      "BE"
+    };
+    write!(f, "(ArwFile::Header byte_order: {}, magic number: {}, ifd_offset: {})", be_str, self.magic_number, self.ifd_offset)
   }
 }

@@ -1,9 +1,14 @@
-use std::io;
 use std::fs::File;
 
 mod header;
 
 pub fn info(filename: &str) {
-    let mut file_handle = try!(File::open(filename));
-    let mut header = header::Header::new(&file_handle);
+    let mut file_handle;
+    match File::open(filename) {
+        Ok(handle) => file_handle = handle ,
+        Err(_e) => panic!("Handle error!"),
+    }
+
+    let header = header::Header::new(& mut file_handle);
+    println!("Header: {}", header);
 }
