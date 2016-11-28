@@ -4,7 +4,6 @@
 // An image file directory contains information about the image, as well as pointers to the actual image data.
 // The following paragraphs describe the image file header and IFD in more detail.
 
-use std::io;
 use std::fs::File;
 use std::io::Read;
 use std::fmt;
@@ -29,6 +28,23 @@ pub struct Header {
 }
 
 impl Header {
+
+  pub fn to_correct_order_u16(&self, buf: &[u8]) -> u16 {
+    return if self.byte_order == ByteOrders::LittleEndian {
+      ((buf[1] as u16) << 8) + (buf[0] as u16)
+    } else {
+      ((buf[0] as u16) << 8) + (buf[1] as u16)
+    }
+  }
+
+  pub fn to_correct_order_u32(&self, buf: &[u8]) -> u32 {
+    return if self.byte_order == ByteOrders::LittleEndian {
+      ((buf[3] as u32) << 24) + ((buf[2] as u32) << 16) + ((buf[1] as u32) << 8) + (buf[0] as u32)
+    } else {
+      ((buf[0] as u32) << 24) + ((buf[1] as u32) << 16) + ((buf[2] as u32) << 8) + (buf[3] as u32)
+    }
+  }
+
   pub fn new(f: & mut File) -> Header {
     let mut buf = vec![0; 10];
 
@@ -44,9 +60,10 @@ impl Header {
     } else {
       panic!("Header byte order unknown!");
     };
-
-
-    Header { byte_order: byte_order, magic_number: 42, ifd_offset: 11 }
+    let mut header = Header { byte_order: byte_order, magic_number: 0, ifd_offset: 0 };
+    header.magic_number = header.to_correct_order_u16(& buf[2 .. 4] );
+    header.ifd_offset = header.to_correct_order_u32(& buf[4 .. 8] );
+    return header;
   }
 }
 
