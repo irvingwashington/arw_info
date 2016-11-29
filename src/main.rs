@@ -21,8 +21,8 @@ fn main() {
     opts.optflag("h", "help", "print this help menu");
 
     let matches = match opts.parse(&args[1..]) {
-        Ok(m) => { m }
-        Err(f) => { panic!(f.to_string()) }
+        Ok(m) => m,
+        Err(f) => panic!(f.to_string()),
     };
 
     if matches.opt_present("h") {
@@ -41,7 +41,7 @@ fn main() {
         Err(err) => {
             println!("{:?}", err);
             return;
-        },
+        }
         Ok(_) => {}
     }
     arw_file::info(&input);
