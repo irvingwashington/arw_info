@@ -15,7 +15,7 @@ pub struct Header {
     // MM - big endian
     magic_number: u16,
     ifd_offset: u32, // 4-7 the offset of the first IFD
-    first_ifd: ifd::IFD,
+    ifds: Vec<ifd::IFD>,
 }
 
 impl Header {
@@ -43,13 +43,21 @@ impl Header {
 
         let magic_number = byte_order.parse_u16(&buf[2..4]);
         let ifd_offset = byte_order.parse_u32(&buf[4..8]);
-        let first_ifd = ifd::IFD::new(f, ifd_offset, &byte_order);
+
+        let mut next_ifd_offset = ifd_offset;
+        let mut ifds: Vec<ifd::IFD> = vec![];
+
+        while next_ifd_offset != 0 {
+            let ifd = ifd::IFD::new(f, next_ifd_offset, &byte_order);
+            next_ifd_offset = ifd.next_ifd_offset;
+            ifds.push(ifd);
+        }
 
         Header {
             byte_order: byte_order,
             magic_number: magic_number,
             ifd_offset: ifd_offset,
-            first_ifd: first_ifd,
+            ifds: ifds,
         }
     }
 }
@@ -61,11 +69,15 @@ impl fmt::Display for Header {
         } else {
             "BE"
         };
-        write!(f,
-               "(ArwFile::Header byte_order: {}, magic number: {}, ifd_offset: {}, first_ifd: {})",
-               be_str,
-               self.magic_number,
-               self.ifd_offset,
-               self.first_ifd)
+        let mut res: fmt::Result;
+        res = write!(f,
+                     "(ArwFile::Header byte_order: {}, magic number: {}, ifd_offset: {})",
+                     be_str,
+                     self.magic_number,
+                     self.ifd_offset);
+        for ifd in &self.ifds {
+            res = write!(f, "\n {}", ifd);
+        }
+        res
     }
 }

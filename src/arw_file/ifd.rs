@@ -8,16 +8,16 @@ use arw_file::byte_orders;
 
 pub struct IFD {
     // Image File Directory
-    entries_count: u16,
-    entries: Vec<IFDEntry>, // 12b x n entries
-    next_ifd_offset: u32, // u32 next ifd offset or 0
+    pub entries_count: u16,
+    pub entries: Vec<IFDEntry>, // 12b x entries_count entries
+    pub next_ifd_offset: u32, // u32 next ifd offset or 0
 }
 
 pub struct IFDEntry {
     tag: u16,
     field_type: u16,
     count: u32, // u32 number of values, count of the indicated type
-    value_offset: u32, // u32 the value offset
+    value_offset: u32, // u32 the value offset OR the value, if the type fits 4bytes :)
 }
 
 impl IFDEntry {
@@ -96,8 +96,6 @@ impl IFD {
             Err(e) => panic!("Error: {}", e),
         }
         let next_ifd_offset = byte_order.parse_u32(&buf[0..4]);
-
-
 
         IFD {
             entries_count: entries_count,
