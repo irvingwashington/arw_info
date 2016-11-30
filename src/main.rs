@@ -2,7 +2,6 @@ extern crate getopts;
 use getopts::Options;
 use std::env;
 use std::fs::File;
-
 mod arw_file;
 
 const VERSION: &'static str = env!("CARGO_PKG_VERSION");

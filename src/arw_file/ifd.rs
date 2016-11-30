@@ -3,8 +3,35 @@ use std::io::Read;
 use std::io::SeekFrom;
 use std::io::Seek;
 use std::fmt;
+use std::mem::transmute;
 
 use arw_file::byte_orders;
+
+#[derive(Debug, PartialEq)]
+pub enum IFDFieldType {
+    BYTE = 1, // 8b
+    ASCII, // 8b with 7bit ascii code, null terminated
+    SHORT, // 16b unsigned
+    LONG, // 32b unsigned
+    RATIONAL, // 64b - 32b unsigned numerator, 32b unsigned denominator
+    SBYTE, // 8b signed
+    UNDEFINED, // 8b ?
+    SSHORT, // 16b signed
+    SLONG, // 32b signed
+    SRATIONAL, // 64b - 32b signed numerator, 32b signed denominator
+    FLOAT, // 32b ieee float
+    DOUBLE, // 64b ieee float
+    UNKNOWN,
+}
+impl IFDFieldType {
+    fn from_u16(int_val: u16) -> IFDFieldType {
+        if int_val > 0 && int_val < 13 {
+            unsafe { transmute(int_val as i8) }
+        } else {
+            IFDFieldType::UNKNOWN
+        }
+    }
+}
 
 pub struct IFD {
     // Image File Directory
@@ -15,7 +42,7 @@ pub struct IFD {
 
 pub struct IFDEntry {
     tag: u16,
-    field_type: u16,
+    field_type: IFDFieldType,
     count: u32, // u32 number of values, count of the indicated type
     value_offset: u32, // u32 the value offset OR the value, if the type fits 4bytes :)
 }
@@ -48,7 +75,7 @@ impl IFDEntry {
 
         IFDEntry {
             tag: tag,
-            field_type: field_type,
+            field_type: IFDFieldType::from_u16(field_type),
             count: count,
             value_offset: value_offset,
         }
@@ -120,7 +147,7 @@ impl fmt::Display for IFD {
 impl fmt::Display for IFDEntry {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f,
-               "(ArwFile::IFDEntry tag: {}, field_type: {}, count: {}, value_offset: {})",
+               "(ArwFile::IFDEntry tag: {}, field_type: {:?}, count: {}, value_offset: {})",
                self.tag,
                self.field_type,
                self.count,
@@ -131,7 +158,7 @@ impl fmt::Display for IFDEntry {
 impl fmt::Debug for IFDEntry {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
         write!(f,
-               "(ArwFile::IFDEntry tag: {}, field_type: {}, count: {}, value_offset: {})",
+               "(ArwFile::IFDEntry tag: {}, field_type: {:?}, count: {}, value_offset: {})",
                self.tag,
                self.field_type,
                self.count,
