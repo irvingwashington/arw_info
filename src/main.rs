@@ -1,4 +1,7 @@
 extern crate getopts;
+#[macro_use]
+extern crate lazy_static;
+
 use getopts::Options;
 use std::env;
 use std::fs::File;
@@ -11,6 +14,7 @@ fn print_usage(program: &str, opts: Options) {
     println!("arw_info {}\n", VERSION);
     print!("{}", opts.usage(&brief));
 }
+
 
 fn main() {
     let args: Vec<String> = env::args().collect();

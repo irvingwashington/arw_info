@@ -6,7 +6,6 @@ use std::io::Seek;
 use std::fmt;
 
 use arw_file::byte_orders;
-use arw_file::ifd::tag;
 
 #[derive(Debug, PartialEq)]
 pub enum IFDFieldType {
@@ -36,7 +35,7 @@ impl IFDFieldType {
 }
 
 pub struct IFDEntry {
-    tag: tag::Tag,
+    tag: u16,
     field_type: IFDFieldType,
     count: u32, // u32 number of values, count of the indicated type
     value_offset: u32, // u32 the value offset OR the value, if the type fits 4bytes :)
@@ -63,12 +62,7 @@ impl IFDEntry {
             }
             Err(e) => panic!("Error: {}", e),
         }
-        let tag_id = byte_order.parse_u16(&buf[0..2]);
-        let tag = match tag::TAGS.get(&tag_id) {
-            Some(tag) => (*tag).clone(),
-            None => { tag::Tag { id: 0, label: format!("Unknown tag {}", &tag_id), description: String::from("").clone() } },
-        };
-
+        let tag = byte_order.parse_u16(&buf[0..2]);
         let field_type = byte_order.parse_u16(&buf[2..4]);
         let count = byte_order.parse_u32(&buf[4..8]);
         let value_offset = byte_order.parse_u32(&buf[8..12]);
