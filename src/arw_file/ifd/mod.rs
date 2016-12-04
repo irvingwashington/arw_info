@@ -47,7 +47,7 @@ impl IFD {
         let mut entries = vec![];
 
         for _ in 0..entries_count {
-            entries.push(IFDEntry::new(&mut f, ifd_entry_offset, &byte_order));
+            entries.push(IFDEntry::new(&mut f, ifd_entry_offset, *byte_order));
             ifd_entry_offset += 12;
         }
 
