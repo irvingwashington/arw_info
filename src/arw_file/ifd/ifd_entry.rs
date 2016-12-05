@@ -36,11 +36,11 @@ impl IFDFieldType {
 }
 
 pub struct IFDEntry {
-    tag: tag::Tag,
-    field_type: IFDFieldType,
-    count: u32, // u32 number of values, count of the indicated type
+    pub tag: tag::Tag,
+    pub field_type: IFDFieldType,
+    pub count: u32, // u32 number of values, count of the indicated type
     value_offset: u32, // u32 the value offset OR the value, if the type fits 4bytes :)
-    value_bytes: Vec<u8>,
+    pub value_bytes: Vec<u8>,
 }
 
 impl IFDEntry {
@@ -81,7 +81,7 @@ impl IFDEntry {
         let value_offset = byte_order.parse_u32(&buf[8..12]);
 
         IFDEntry {
-            value_bytes: IFDEntry::value_bytes(&mut f, count as usize, &byte_order, value_offset),
+            value_bytes: IFDEntry::value_bytes(&mut f, count as usize, &byte_order, value_offset), // TODO: pass number of bytes in count
             tag: tag,
             field_type: IFDFieldType::from_u16(field_type),
             count: count,

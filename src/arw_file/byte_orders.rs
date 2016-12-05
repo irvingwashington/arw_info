@@ -13,6 +13,14 @@ impl ByteOrders {
         };
     }
 
+    pub fn to_str(&self) -> String {
+        if *self == ByteOrders::BigEndian {
+            String::from("BE")
+        } else {
+            String::from("LE")
+        }
+    }
+
     pub fn parse_u32(&self, buf: &[u8]) -> u32 {
         return if *self == ByteOrders::LittleEndian {
             ((buf[3] as u32) << 24) + ((buf[2] as u32) << 16) + ((buf[1] as u32) << 8) +

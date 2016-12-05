@@ -9,13 +9,13 @@ const BE_MAGIC: u8 = 77;
 const LE_MAGIC: u8 = 73;
 
 pub struct Header {
-    byte_order: byte_orders::ByteOrders,
+    pub byte_order: byte_orders::ByteOrders,
     // 0-1 The byte order used within the file. Legal values are:
     // II - little endian
     // MM - big endian
-    magic_number: u16,
+    pub magic_number: u16,
     ifd_offset: u32, // 4-7 the offset of the first IFD
-    ifds: Vec<ifd::IFD>,
+    pub ifds: Vec<ifd::IFD>,
 }
 
 impl Header {
