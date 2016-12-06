@@ -4,11 +4,50 @@ use std::io::Read;
 use std::io::SeekFrom;
 use std::io::Seek;
 use std::fmt;
+use std::collections::HashMap;
 
 use arw_file::byte_orders;
 use arw_file::ifd::tag;
 
-#[derive(Debug, PartialEq)]
+#[derive(Clone)]
+pub struct FieldType {
+    name: String,
+    width: u8,
+}
+
+impl fmt::Debug for FieldType {
+    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
+        write!(f, "{}({}b)", self.name, self.width)
+    }
+}
+
+lazy_static! {
+    pub static ref IFDFieldTypes : HashMap<u16, FieldType> = {
+        let mut m = HashMap::new();
+        m.insert(1, FieldType {name: String::from("BYTE"), width: 1});
+        m.insert(2, FieldType {name: String::from("ASCII"), width: 1});
+        m.insert(3, FieldType {name: String::from("SHORT"), width: 2});
+        m.insert(4, FieldType {name: String::from("LONG"), width: 4});
+        m.insert(5, FieldType {name: String::from("RATIONAL"), width: 8});
+        m.insert(6, FieldType {name: String::from("SBYTE"), width: 4});
+        m.insert(7, FieldType {name: String::from("UNDEFINED"), width: 1});
+        m.insert(8, FieldType {name: String::from("SSHORT"), width: 2});
+        m.insert(9, FieldType {name: String::from("SLONG"), width: 4});
+        m.insert(10, FieldType {name: String::from("SRATIONAL"), width: 8});
+        m.insert(11, FieldType {name: String::from("FLOAT"), width: 4});
+        m.insert(12, FieldType {name: String::from("DOUBLE"), width: 8});
+        m
+    };
+}
+
+fn u16_to_field_type(val: u16) -> FieldType {
+    if IFDFieldTypes.contains_key(&val) {
+        IFDFieldTypes[&val].clone()
+    } else {
+        FieldType { name: String::from("Unknown"), width: 1 }
+    }
+}
+
 pub enum IFDFieldType {
     BYTE = 1, // 8b
     ASCII, // 8b with 7bit ascii code, null terminated *
@@ -37,7 +76,7 @@ impl IFDFieldType {
 
 pub struct IFDEntry {
     pub tag: tag::Tag,
-    pub field_type: IFDFieldType,
+    pub field_type: FieldType,
     pub count: u32, // u32 number of values, count of the indicated type
     value_offset: u32, // u32 the value offset OR the value, if the type fits 4bytes :)
     pub value_bytes: Vec<u8>,
@@ -83,7 +122,7 @@ impl IFDEntry {
         IFDEntry {
             value_bytes: IFDEntry::value_bytes(&mut f, count as usize, &byte_order, value_offset), // TODO: pass number of bytes in count
             tag: tag,
-            field_type: IFDFieldType::from_u16(field_type),
+            field_type: u16_to_field_type(field_type),
             count: count,
             value_offset: value_offset,
         }
@@ -122,7 +161,7 @@ impl IFDEntry {
     }
 
     pub fn ascii_value(&self) -> Option<String> {
-        if self.field_type != IFDFieldType::ASCII {
+        if self.field_type.name != String::from("ASCII") {
             return None;
         }
         match String::from_utf8(self.value_bytes.to_vec()) {

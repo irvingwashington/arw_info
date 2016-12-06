@@ -31,19 +31,6 @@ impl ByteOrders {
         };
     }
 
-    pub fn u16_to_slice(&self, val: u16) -> [u8; 2] {
-        let mut buf: [u8; 2] = [0, 0];
-
-        if *self == ByteOrders::LittleEndian {
-            buf[1] = ((val >> 8) & 0xFF) as u8;
-            buf[0] = (val & 0xFF) as u8;
-        } else {
-            buf[0] = ((val >> 8) & 0xFF) as u8;
-            buf[1] = (val & 0xFF) as u8;
-        }
-        buf
-    }
-
     pub fn u32_to_slice(&self, val: u32) -> [u8; 4] {
         let mut buf: [u8; 4] = [0, 0, 0, 0];
         if *self == ByteOrders::LittleEndian {
@@ -87,19 +74,6 @@ mod tests {
     fn test_le_parse_u32() {
         let bo = ByteOrders::LittleEndian;
         assert_eq!(bo.parse_u32(&[0, 0, 0, 1]), 0x1000000);
-    }
-
-
-    #[test]
-    fn test_be_u16_to_slice() {
-        let bo = ByteOrders::BigEndian;
-        assert_eq!(bo.u16_to_slice(0x100), [1, 0]);
-    }
-
-    #[test]
-    fn test_le_u16_to_slice() {
-        let bo = ByteOrders::LittleEndian;
-        assert_eq!(bo.u16_to_slice(0x100), [0, 1]);
     }
 
     #[test]
