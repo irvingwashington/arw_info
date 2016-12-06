@@ -17,6 +17,7 @@ pub struct IFD {
     pub entries_count: u16,
     pub entries: Vec<IFDEntry>, // 12b x entries_count entries
     pub next_ifd_offset: u32, // u32 next ifd offset or 0
+    pub ifd_type: String,
 }
 
 impl IFD {
@@ -65,7 +66,22 @@ impl IFD {
             entries_count: entries_count,
             entries: entries,
             next_ifd_offset: next_ifd_offset,
+            ifd_type: String::from("main"),
         }
+    }
+
+    pub fn sub_ifds(&self, mut f: &mut File, byte_order: &byte_orders::ByteOrders) -> Vec<IFD> {
+        let mut sub_ifds: Vec<IFD> = vec!();
+
+        for entry in &self.entries {
+            if entry.is_ifd() {
+                let mut sub_ifd = IFD::new(f, entry.value_offset, byte_order);
+                sub_ifd.ifd_type = entry.tag.label.clone();
+                sub_ifds.push(sub_ifd);
+            }
+        }
+
+        sub_ifds
     }
 }
 

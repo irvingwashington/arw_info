@@ -30,7 +30,8 @@ rust_static_src << "    pub static ref TAGS : HashMap<u16, Tag> = {"
 rust_static_src << "        let mut m = HashMap::new();"
 
 tags.each do |id, tag|
-  rust_static_src << "        m.insert(#{id}, Tag {id: #{id}, label: String::from(\"#{tag[:label]}\"), description: String::from(\"#{tag[:description]}\")});"
+  ifd = !!(tag[:label] =~ /IFD/)
+  rust_static_src << "        m.insert(#{id}, Tag {id: #{id}, ifd: #{ifd.inspect}, label: String::from(\"#{tag[:label]}\"), description: String::from(\"#{tag[:description]}\")});"
 end
 
 rust_static_src << "        m"

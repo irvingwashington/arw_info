@@ -1,4 +1,3 @@
-use std::mem::transmute;
 use std::fs::File;
 use std::io::Read;
 use std::io::SeekFrom;
@@ -44,32 +43,9 @@ fn u16_to_field_type(val: u16) -> FieldType {
     if IFDFieldTypes.contains_key(&val) {
         IFDFieldTypes[&val].clone()
     } else {
-        FieldType { name: String::from("Unknown"), width: 1 }
-    }
-}
-
-pub enum IFDFieldType {
-    BYTE = 1, // 8b
-    ASCII, // 8b with 7bit ascii code, null terminated *
-    SHORT, // 16b unsigned
-    LONG, // 32b unsigned
-    RATIONAL, // 64b - 32b unsigned numerator, 32b unsigned denominator *
-    SBYTE, // 8b signed
-    UNDEFINED, // 8b ?
-    SSHORT, // 16b signed
-    SLONG, // 32b signed
-    SRATIONAL, // 64b - 32b signed numerator, 32b signed denominator *
-    FLOAT, // 32b ieee float
-    DOUBLE, // 64b ieee float  *
-    UNKNOWN, // Internal, not from the specification *
-}
-
-impl IFDFieldType {
-    fn from_u16(int_val: u16) -> IFDFieldType {
-        if int_val > 0 && int_val < 13 {
-            unsafe { transmute(int_val as i8) }
-        } else {
-            IFDFieldType::UNKNOWN
+        FieldType {
+            name: String::from("Unknown"),
+            width: 1,
         }
     }
 }
@@ -78,7 +54,7 @@ pub struct IFDEntry {
     pub tag: tag::Tag,
     pub field_type: FieldType,
     pub count: u32, // u32 number of values, count of the indicated type
-    value_offset: u32, // u32 the value offset OR the value, if the type fits 4bytes :)
+    pub value_offset: u32, // u32 the value offset OR the value, if the type fits 4bytes :)
     pub value_bytes: Vec<u8>,
 }
 
@@ -109,20 +85,23 @@ impl IFDEntry {
             None => {
                 tag::Tag {
                     id: 0,
+                    ifd: false,
                     label: format!("Unknown tag {}", &tag_id),
                     description: String::from("").clone(),
                 }
             }
         };
 
-        let field_type = byte_order.parse_u16(&buf[2..4]);
+        let field_type = u16_to_field_type(byte_order.parse_u16(&buf[2..4]));
         let count = byte_order.parse_u32(&buf[4..8]);
         let value_offset = byte_order.parse_u32(&buf[8..12]);
 
+        let byte_width = (count * field_type.width as u32) as usize;
+
         IFDEntry {
-            value_bytes: IFDEntry::value_bytes(&mut f, count as usize, &byte_order, value_offset), // TODO: pass number of bytes in count
+            value_bytes: IFDEntry::value_bytes(&mut f, byte_width, &byte_order, value_offset),
             tag: tag,
-            field_type: u16_to_field_type(field_type),
+            field_type: field_type,
             count: count,
             value_offset: value_offset,
         }
@@ -133,6 +112,7 @@ impl IFDEntry {
                        byte_order: &byte_orders::ByteOrders,
                        value_offset: u32)
                        -> Vec<u8> {
+
         let mut buf = vec![0; count];
         if count <= 4 {
             // Fill buffer from value field
@@ -166,8 +146,12 @@ impl IFDEntry {
         }
         match String::from_utf8(self.value_bytes.to_vec()) {
             Ok(str) => return Some(str),
-            Err(e) => return None,
+            Err(_) => return None,
         }
+    }
+
+    pub fn is_ifd(&self) -> bool {
+        self.tag.ifd || self.tag.label == String::from("MakerNote")
     }
 }
 
