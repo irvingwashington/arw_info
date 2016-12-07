@@ -11,6 +11,7 @@ SOURCE_URIS = %w[
   http://www.awaresystems.be/imaging/tiff/tifftags/privateifd/exif.html
   http://www.awaresystems.be/imaging/tiff/tifftags/privateifd/gps.html
 ].map { |url| URI.parse(url) }
+SONY_URI = URI.parse("http://www.sno.phy.queensu.ca/~phil/exiftool/TagNames/Sony.html")
 
 tags = {}
 SOURCE_URIS.each do |uri|
@@ -21,6 +22,16 @@ SOURCE_URIS.each do |uri|
     tags[id] = { label: label, description: description }
   end
 end
+
+sony_tags = {}
+Nokogiri::HTML(Net::HTTP.get(SONY_URI)).xpath("/html/body/blockquote[1]/table[@class='frame']/tr/td/table/tr").each do |tr_node|
+  id, name, _, _ = tr_node.xpath('td').map(&:text)
+  next if id == "Tag ID" || id.nil?
+  id = id.to_i(16)
+  name = name.split("\n").map(&:strip).join(' / ')
+  sony_tags[id] = { label: name, description: "-" }
+end
+
 
 rust_static_src = [OUTPUT_DELIMITER]
 rust_static_src << "// #{Time.now.to_s} "
@@ -36,6 +47,18 @@ end
 
 rust_static_src << "        m"
 rust_static_src << "    };" # value
+
+rust_static_src << "    pub static ref SONY_TAGS : HashMap<u16, Tag> = {"
+rust_static_src << "        let mut m = HashMap::new();"
+
+sony_tags.each do |id, tag|
+  ifd = !!(tag[:label] =~ /IFD/)
+  rust_static_src << "        m.insert(#{id}, Tag {id: #{id}, ifd: #{ifd.inspect}, label: String::from(\"#{tag[:label]}\"), description: String::from(\"#{tag[:description]}\")});"
+end
+
+rust_static_src << "        m"
+rust_static_src << "    };" # value
+
 rust_static_src << "}" # lazy_static!
 
 rust_code = rust_static_src.join("\n")

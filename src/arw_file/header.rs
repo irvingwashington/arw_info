@@ -48,9 +48,9 @@ impl Header {
         let mut ifds: Vec<ifd::IFD> = vec![];
 
         while next_ifd_offset != 0 {
-            let ifd = ifd::IFD::new(f, next_ifd_offset, &byte_order);
+            let ifd = ifd::IFD::new(f, next_ifd_offset, &byte_order, &String::from("Main"));
             next_ifd_offset = ifd.next_ifd_offset;
-            let sub_ifds = ifd.sub_ifds(f, &byte_order) ;
+            let sub_ifds = ifd.sub_ifds(f, &byte_order);
             ifds.push(ifd);
             for sub_ifd in sub_ifds {
                 ifds.push(sub_ifd);

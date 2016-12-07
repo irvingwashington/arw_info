@@ -16,9 +16,9 @@ impl fmt::Display for Tag {
 }
 
 // Auto-generated code below
-// 2016-12-06 22:15:11 +0100 
+// 2016-12-07 21:07:57 +0100
 
-lazy_static! { 
+lazy_static! {
     pub static ref TAGS : HashMap<u16, Tag> = {
         let mut m = HashMap::new();
         m.insert(254, Tag {id: 254, ifd: false, label: String::from("NewSubfileType"), description: String::from("A general indication of the kind of data contained in this subfile.")});
@@ -277,6 +277,96 @@ lazy_static! {
         m.insert(28, Tag {id: 28, ifd: false, label: String::from("GPSAreaInformation"), description: String::from("A character string recording the name of the GPS area.")});
         m.insert(29, Tag {id: 29, ifd: false, label: String::from("GPSDateStamp"), description: String::from("A character string recording date and time information relative to UTC (Coordinated Universal Time).")});
         m.insert(30, Tag {id: 30, ifd: false, label: String::from("GPSDifferential"), description: String::from("Indicates whether differential correction is applied to the GPS receiver.")});
+        m
+    };
+    pub static ref SONY_TAGS : HashMap<u16, Tag> = {
+        let mut m = HashMap::new();
+        m.insert(16, Tag {id: 16, ifd: false, label: String::from("CameraInfo / CameraInfo2 / CameraInfo3 / CameraInfoUnknown"), description: String::from("-")});
+        m.insert(32, Tag {id: 32, ifd: false, label: String::from("FocusInfo / MoreInfo"), description: String::from("-")});
+        m.insert(258, Tag {id: 258, ifd: false, label: String::from("Quality"), description: String::from("-")});
+        m.insert(260, Tag {id: 260, ifd: false, label: String::from("FlashExposureComp"), description: String::from("-")});
+        m.insert(261, Tag {id: 261, ifd: false, label: String::from("Teleconverter"), description: String::from("-")});
+        m.insert(274, Tag {id: 274, ifd: false, label: String::from("WhiteBalanceFineTune"), description: String::from("-")});
+        m.insert(276, Tag {id: 276, ifd: false, label: String::from("CameraSettings / CameraSettings2 / CameraSettings3 / CameraSettingsUnknown"), description: String::from("-")});
+        m.insert(277, Tag {id: 277, ifd: false, label: String::from("WhiteBalance"), description: String::from("-")});
+        m.insert(278, Tag {id: 278, ifd: false, label: String::from("ExtraInfo / ExtraInfo2 / ExtraInfo3"), description: String::from("-")});
+        m.insert(3584, Tag {id: 3584, ifd: false, label: String::from("PrintIM"), description: String::from("-")});
+        m.insert(4096, Tag {id: 4096, ifd: false, label: String::from("MultiBurstMode"), description: String::from("-")});
+        m.insert(4097, Tag {id: 4097, ifd: false, label: String::from("MultiBurstImageWidth"), description: String::from("-")});
+        m.insert(4098, Tag {id: 4098, ifd: false, label: String::from("MultiBurstImageHeight"), description: String::from("-")});
+        m.insert(4099, Tag {id: 4099, ifd: false, label: String::from("Panorama"), description: String::from("-")});
+        m.insert(8193, Tag {id: 8193, ifd: false, label: String::from("PreviewImage"), description: String::from("-")});
+        m.insert(8194, Tag {id: 8194, ifd: false, label: String::from("Rating"), description: String::from("-")});
+        m.insert(8196, Tag {id: 8196, ifd: false, label: String::from("Contrast"), description: String::from("-")});
+        m.insert(8197, Tag {id: 8197, ifd: false, label: String::from("Saturation"), description: String::from("-")});
+        m.insert(8198, Tag {id: 8198, ifd: false, label: String::from("Sharpness"), description: String::from("-")});
+        m.insert(8199, Tag {id: 8199, ifd: false, label: String::from("Brightness"), description: String::from("-")});
+        m.insert(8200, Tag {id: 8200, ifd: false, label: String::from("LongExposureNoiseReduction"), description: String::from("-")});
+        m.insert(8201, Tag {id: 8201, ifd: false, label: String::from("HighISONoiseReduction"), description: String::from("-")});
+        m.insert(8202, Tag {id: 8202, ifd: false, label: String::from("HDR"), description: String::from("-")});
+        m.insert(8203, Tag {id: 8203, ifd: false, label: String::from("MultiFrameNoiseReduction"), description: String::from("-")});
+        m.insert(8206, Tag {id: 8206, ifd: false, label: String::from("PictureEffect"), description: String::from("-")});
+        m.insert(8207, Tag {id: 8207, ifd: false, label: String::from("SoftSkinEffect"), description: String::from("-")});
+        m.insert(8208, Tag {id: 8208, ifd: false, label: String::from("Tag2010a / Tag2010b / Tag2010c / Tag2010d / Tag2010e / Tag2010f / Tag2010g / Tag2010h"), description: String::from("-")});
+        m.insert(8209, Tag {id: 8209, ifd: false, label: String::from("VignettingCorrection"), description: String::from("-")});
+        m.insert(8210, Tag {id: 8210, ifd: false, label: String::from("LateralChromaticAberration"), description: String::from("-")});
+        m.insert(8211, Tag {id: 8211, ifd: false, label: String::from("DistortionCorrectionSetting"), description: String::from("-")});
+        m.insert(8212, Tag {id: 8212, ifd: false, label: String::from("WBShiftAB_GM"), description: String::from("-")});
+        m.insert(8214, Tag {id: 8214, ifd: false, label: String::from("AutoPortraitFramed"), description: String::from("-")});
+        m.insert(8215, Tag {id: 8215, ifd: false, label: String::from("FlashAction"), description: String::from("-")});
+        m.insert(8219, Tag {id: 8219, ifd: false, label: String::from("FocusMode"), description: String::from("-")});
+        m.insert(8220, Tag {id: 8220, ifd: false, label: String::from("AFAreaModeSetting"), description: String::from("-")});
+        m.insert(8221, Tag {id: 8221, ifd: false, label: String::from("FlexibleSpotPosition"), description: String::from("-")});
+        m.insert(8222, Tag {id: 8222, ifd: false, label: String::from("AFPointSelected / AFZoneSelected"), description: String::from("-")});
+        m.insert(8224, Tag {id: 8224, ifd: false, label: String::from("AFPointsUsed"), description: String::from("-")});
+        m.insert(8226, Tag {id: 8226, ifd: false, label: String::from("FocalPlaneAFPointsUsed"), description: String::from("-")});
+        m.insert(8230, Tag {id: 8230, ifd: false, label: String::from("WBShiftAB_GM_Precise"), description: String::from("-")});
+        m.insert(8231, Tag {id: 8231, ifd: false, label: String::from("FocusLocation"), description: String::from("-")});
+        m.insert(8232, Tag {id: 8232, ifd: false, label: String::from("VariableLowPassFilter"), description: String::from("-")});
+        m.insert(8233, Tag {id: 8233, ifd: false, label: String::from("RAWFileType"), description: String::from("-")});
+        m.insert(8234, Tag {id: 8234, ifd: false, label: String::from("Tag202a"), description: String::from("-")});
+        m.insert(12288, Tag {id: 12288, ifd: false, label: String::from("ShotInfo"), description: String::from("-")});
+        m.insert(36875, Tag {id: 36875, ifd: false, label: String::from("Tag900b"), description: String::from("-")});
+        m.insert(36944, Tag {id: 36944, ifd: false, label: String::from("Tag9050a / Tag9050b"), description: String::from("-")});
+        m.insert(37888, Tag {id: 37888, ifd: false, label: String::from("Tag9400a / Tag9400b / Tag9400c"), description: String::from("-")});
+        m.insert(37890, Tag {id: 37890, ifd: false, label: String::from("Tag9402"), description: String::from("-")});
+        m.insert(37891, Tag {id: 37891, ifd: false, label: String::from("Tag9403"), description: String::from("-")});
+        m.insert(37892, Tag {id: 37892, ifd: false, label: String::from("Tag9404a / Tag9404b"), description: String::from("-")});
+        m.insert(37893, Tag {id: 37893, ifd: false, label: String::from("Tag9405a / Tag9405b"), description: String::from("-")});
+        m.insert(37894, Tag {id: 37894, ifd: false, label: String::from("Tag9406"), description: String::from("-")});
+        m.insert(37898, Tag {id: 37898, ifd: false, label: String::from("Tag940a"), description: String::from("-")});
+        m.insert(37900, Tag {id: 37900, ifd: false, label: String::from("Tag940c"), description: String::from("-")});
+        m.insert(37902, Tag {id: 37902, ifd: false, label: String::from("AFInfo / Tag940e"), description: String::from("-")});
+        m.insert(45056, Tag {id: 45056, ifd: false, label: String::from("FileFormat"), description: String::from("-")});
+        m.insert(45057, Tag {id: 45057, ifd: false, label: String::from("SonyModelID"), description: String::from("-")});
+        m.insert(45088, Tag {id: 45088, ifd: false, label: String::from("CreativeStyle"), description: String::from("-")});
+        m.insert(45089, Tag {id: 45089, ifd: false, label: String::from("ColorTemperature"), description: String::from("-")});
+        m.insert(45090, Tag {id: 45090, ifd: false, label: String::from("ColorCompensationFilter"), description: String::from("-")});
+        m.insert(45091, Tag {id: 45091, ifd: false, label: String::from("SceneMode"), description: String::from("-")});
+        m.insert(45092, Tag {id: 45092, ifd: false, label: String::from("ZoneMatching"), description: String::from("-")});
+        m.insert(45093, Tag {id: 45093, ifd: false, label: String::from("DynamicRangeOptimizer"), description: String::from("-")});
+        m.insert(45094, Tag {id: 45094, ifd: false, label: String::from("ImageStabilization"), description: String::from("-")});
+        m.insert(45095, Tag {id: 45095, ifd: false, label: String::from("LensType"), description: String::from("-")});
+        m.insert(45096, Tag {id: 45096, ifd: false, label: String::from("MinoltaMakerNote"), description: String::from("-")});
+        m.insert(45097, Tag {id: 45097, ifd: false, label: String::from("ColorMode"), description: String::from("-")});
+        m.insert(45098, Tag {id: 45098, ifd: false, label: String::from("LensSpec"), description: String::from("-")});
+        m.insert(45099, Tag {id: 45099, ifd: false, label: String::from("FullImageSize"), description: String::from("-")});
+        m.insert(45100, Tag {id: 45100, ifd: false, label: String::from("PreviewImageSize"), description: String::from("-")});
+        m.insert(45120, Tag {id: 45120, ifd: false, label: String::from("Macro"), description: String::from("-")});
+        m.insert(45121, Tag {id: 45121, ifd: false, label: String::from("ExposureMode"), description: String::from("-")});
+        m.insert(45122, Tag {id: 45122, ifd: false, label: String::from("FocusMode"), description: String::from("-")});
+        m.insert(45123, Tag {id: 45123, ifd: false, label: String::from("AFAreaMode"), description: String::from("-")});
+        m.insert(45124, Tag {id: 45124, ifd: false, label: String::from("AFIlluminator"), description: String::from("-")});
+        m.insert(45127, Tag {id: 45127, ifd: false, label: String::from("JPEGQuality"), description: String::from("-")});
+        m.insert(45128, Tag {id: 45128, ifd: false, label: String::from("FlashLevel"), description: String::from("-")});
+        m.insert(45129, Tag {id: 45129, ifd: false, label: String::from("ReleaseMode"), description: String::from("-")});
+        m.insert(45130, Tag {id: 45130, ifd: false, label: String::from("SequenceNumber"), description: String::from("-")});
+        m.insert(45131, Tag {id: 45131, ifd: false, label: String::from("Anti-Blur"), description: String::from("-")});
+        m.insert(45134, Tag {id: 45134, ifd: false, label: String::from("FocusMode"), description: String::from("-")});
+        m.insert(45135, Tag {id: 45135, ifd: false, label: String::from("DynamicRangeOptimizer"), description: String::from("-")});
+        m.insert(45136, Tag {id: 45136, ifd: false, label: String::from("HighISONoiseReduction2"), description: String::from("-")});
+        m.insert(45138, Tag {id: 45138, ifd: false, label: String::from("IntelligentAuto"), description: String::from("-")});
+        m.insert(45140, Tag {id: 45140, ifd: false, label: String::from("WhiteBalance"), description: String::from("-")});
         m
     };
 }

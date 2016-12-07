@@ -21,7 +21,11 @@ pub struct IFD {
 }
 
 impl IFD {
-    pub fn new(mut f: &mut File, offset: u32, byte_order: &byte_orders::ByteOrders) -> IFD {
+    pub fn new(mut f: &mut File,
+               offset: u32,
+               byte_order: &byte_orders::ByteOrders,
+               ifd_type: &String)
+               -> IFD {
         let mut buf = vec![0; 4];
 
         match (*f).seek(SeekFrom::Start(offset as u64)) {
@@ -48,7 +52,7 @@ impl IFD {
         let mut entries = vec![];
 
         for _ in 0..entries_count {
-            entries.push(IFDEntry::new(&mut f, ifd_entry_offset, *byte_order));
+            entries.push(IFDEntry::new(&mut f, ifd_entry_offset, *byte_order, &ifd_type));
             ifd_entry_offset += 12;
         }
 
@@ -66,20 +70,24 @@ impl IFD {
             entries_count: entries_count,
             entries: entries,
             next_ifd_offset: next_ifd_offset,
-            ifd_type: String::from("main"),
+            ifd_type: ifd_type.clone(),
         }
     }
 
     pub fn sub_ifds(&self, mut f: &mut File, byte_order: &byte_orders::ByteOrders) -> Vec<IFD> {
-        let mut sub_ifds: Vec<IFD> = vec!();
+        let mut sub_ifds: Vec<IFD> = vec![];
 
         for entry in &self.entries {
             if entry.is_ifd() {
-                let mut sub_ifd = IFD::new(f, entry.value_offset, byte_order);
-                sub_ifd.ifd_type = entry.tag.label.clone();
-                sub_ifds.push(sub_ifd);
+                let mut ifd = IFD::new(f, entry.value_offset, byte_order, &entry.tag.label);
+
+                for sub_ifd in ifd.sub_ifds(f, byte_order) {
+                    sub_ifds.push(sub_ifd);
+                }
+
+                sub_ifds.push(ifd);
             }
-        }
+        } // TODO: Follow-up with next_ifd_offset
 
         sub_ifds
     }

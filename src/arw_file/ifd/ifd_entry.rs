@@ -59,7 +59,11 @@ pub struct IFDEntry {
 }
 
 impl IFDEntry {
-    pub fn new(mut f: &mut File, offset: u32, byte_order: byte_orders::ByteOrders) -> IFDEntry {
+    pub fn new(mut f: &mut File,
+               offset: u32,
+               byte_order: byte_orders::ByteOrders,
+               ifd_type: &String)
+               -> IFDEntry {
         match (*f).seek(SeekFrom::Start(offset as u64)) {
             Ok(position) => {
                 if position != (offset as u64) {
@@ -80,17 +84,6 @@ impl IFDEntry {
             Err(e) => panic!("Error: {}", e),
         }
         let tag_id = byte_order.parse_u16(&buf[0..2]);
-        let tag = match tag::TAGS.get(&tag_id) {
-            Some(tag) => (*tag).clone(),
-            None => {
-                tag::Tag {
-                    id: 0,
-                    ifd: false,
-                    label: format!("Unknown tag {}", &tag_id),
-                    description: String::from("").clone(),
-                }
-            }
-        };
 
         let field_type = u16_to_field_type(byte_order.parse_u16(&buf[2..4]));
         let count = byte_order.parse_u32(&buf[4..8]);
@@ -100,11 +93,32 @@ impl IFDEntry {
 
         IFDEntry {
             value_bytes: IFDEntry::value_bytes(&mut f, byte_width, &byte_order, value_offset),
-            tag: tag,
+            tag: IFDEntry::tag_for_id(tag_id, *ifd_type == String::from("MakerNote")),
             field_type: field_type,
             count: count,
             value_offset: value_offset,
         }
+    }
+
+    fn tag_for_id(id: u16, sony_tags: bool) -> tag::Tag {
+        let tag_result = if sony_tags {
+            tag::SONY_TAGS.get(&id)
+        } else {
+            tag::TAGS.get(&id)
+        };
+
+        match tag_result {
+            Some(tag) => (*tag).clone(),
+            None => {
+                tag::Tag {
+                    id: 0,
+                    ifd: false,
+                    label: format!("Unknown tag {}", &id),
+                    description: String::from(""),
+                }
+            }
+        }
+
     }
 
     pub fn value_bytes(f: &mut File,
