@@ -23,7 +23,7 @@ pub struct IFD {
 impl IFD {
     pub fn new(mut f: &mut File,
                offset: u32,
-               byte_order: &byte_orders::ByteOrders,
+               byte_order: &byte_orders::ByteOrder,
                ifd_type: &String)
                -> IFD {
         let mut buf = vec![0; 4];
@@ -74,12 +74,12 @@ impl IFD {
         }
     }
 
-    pub fn sub_ifds(&self, mut f: &mut File, byte_order: &byte_orders::ByteOrders) -> Vec<IFD> {
+    pub fn sub_ifds(&self, mut f: &mut File, byte_order: &byte_orders::ByteOrder) -> Vec<IFD> {
         let mut sub_ifds: Vec<IFD> = vec![];
 
         for entry in &self.entries {
             if entry.is_ifd() {
-                let mut ifd = IFD::new(f, entry.value_offset, byte_order, &entry.tag.label);
+                let ifd = IFD::new(f, entry.value_offset, byte_order, &entry.tag.label);
 
                 for sub_ifd in ifd.sub_ifds(f, byte_order) {
                     sub_ifds.push(sub_ifd);

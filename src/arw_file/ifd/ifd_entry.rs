@@ -61,7 +61,7 @@ pub struct IFDEntry {
 impl IFDEntry {
     pub fn new(mut f: &mut File,
                offset: u32,
-               byte_order: byte_orders::ByteOrders,
+               byte_order: byte_orders::ByteOrder,
                ifd_type: &String)
                -> IFDEntry {
         match (*f).seek(SeekFrom::Start(offset as u64)) {
@@ -123,7 +123,7 @@ impl IFDEntry {
 
     pub fn value_bytes(f: &mut File,
                        count: usize,
-                       byte_order: &byte_orders::ByteOrders,
+                       byte_order: &byte_orders::ByteOrder,
                        value_offset: u32)
                        -> Vec<u8> {
 

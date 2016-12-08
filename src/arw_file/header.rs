@@ -9,7 +9,7 @@ const BE_MAGIC: u8 = 77;
 const LE_MAGIC: u8 = 73;
 
 pub struct Header {
-    pub byte_order: byte_orders::ByteOrders,
+    pub byte_order: byte_orders::ByteOrder,
     // 0-1 The byte order used within the file. Legal values are:
     // II - little endian
     // MM - big endian
@@ -34,9 +34,9 @@ impl Header {
         }
 
         let byte_order = if buf[0] == buf[1] && buf[1] == LE_MAGIC {
-            byte_orders::ByteOrders::LittleEndian
+            byte_orders::ByteOrder::LittleEndian
         } else if buf[0] == buf[1] && buf[1] == BE_MAGIC {
-            byte_orders::ByteOrders::BigEndian
+            byte_orders::ByteOrder::BigEndian
         } else {
             panic!("Header byte order unknown!");
         };
@@ -68,7 +68,7 @@ impl Header {
 
 impl fmt::Display for Header {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let be_str = if self.byte_order == byte_orders::ByteOrders::LittleEndian {
+        let be_str = if self.byte_order == byte_orders::ByteOrder::LittleEndian {
             "LE"
         } else {
             "BE"
