@@ -4,13 +4,13 @@
 - Implement ifd entry type parsing and formatting as string:
   - byte ( )
   - ascii (x)
-  - short
-  - long
+  - short (x)
+  - long (x)
   - rational
   - signed byte
   - undefined (x)
-  - signed short
-  - signed long
+  - signed short (x)
+  - signed long (x)
   - signed rational
   - float
   - double
