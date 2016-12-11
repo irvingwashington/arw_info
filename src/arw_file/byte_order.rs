@@ -36,7 +36,7 @@ impl ByteOrder {
         let mask: u16 = 32768; // 2:u16.pow(15)
 
         let input_value = self.parse_u16(&buf);
-        (- ((input_value & mask) as i32) + (input_value & !mask) as i32) as i16
+        (-((input_value & mask) as i32) + (input_value & !mask) as i32) as i16
     }
 
     // Two's complement
@@ -44,7 +44,7 @@ impl ByteOrder {
         let mask: u32 = 2147483648; // 2:u32.pow(31)
 
         let input_value = self.parse_u32(&buf);
-        (- ((input_value & mask) as i64) + (input_value & !mask) as i64) as i32
+        (-((input_value & mask) as i64) + (input_value & !mask) as i64) as i32
     }
 
     pub fn u32_to_slice(&self, val: u32) -> [u8; 4] {
