@@ -2,6 +2,7 @@ use std::fs::File;
 mod header;
 mod ifd;
 mod byte_order;
+mod format;
 
 pub fn pretty_print(filename: &str, header: &header::Header) {
     println!("{} ({}), magic number: {}",
