@@ -4,8 +4,9 @@ use std::io::SeekFrom;
 use std::io::Seek;
 use std::fmt;
 use std::collections::HashMap;
+use std::fmt::Write;
 
-use arw_file::byte_orders;
+use arw_file::byte_order;
 use arw_file::ifd::tag;
 
 #[derive(Clone)]
@@ -39,6 +40,20 @@ lazy_static! {
     };
 }
 
+pub fn vec_to_string<T: fmt::Display>(collection: &Vec<T>) -> String {
+        let mut str_form = String::from("[");
+
+        let mut first = true;
+
+        for elem in collection {
+            if !first { write!(&mut str_form, ", "); };
+            write!(&mut str_form, "{}", elem);
+            first = false;
+        }
+        write!(&mut str_form, "]");
+        str_form
+}
+
 fn u16_to_field_type(val: u16) -> FieldType {
     if IFDFieldTypes.contains_key(&val) {
         IFDFieldTypes[&val].clone()
@@ -56,14 +71,16 @@ pub struct IFDEntry {
     pub count: u32, // u32 number of values, count of the indicated type
     pub value_offset: u32, // u32 the value offset OR the value, if the type fits 4bytes :)
     pub value_bytes: Vec<u8>,
+    pub byte_order: byte_order::ByteOrder
 }
 
-impl IFDEntry {
+impl IFDEntry  {
     pub fn new(mut f: &mut File,
                offset: u32,
-               byte_order: byte_orders::ByteOrder,
+               byte_order: byte_order::ByteOrder,
                ifd_type: &String)
                -> IFDEntry {
+
         match (*f).seek(SeekFrom::Start(offset as u64)) {
             Ok(position) => {
                 if position != (offset as u64) {
@@ -97,6 +114,7 @@ impl IFDEntry {
             field_type: field_type,
             count: count,
             value_offset: value_offset,
+            byte_order: byte_order
         }
     }
 
@@ -123,7 +141,7 @@ impl IFDEntry {
 
     pub fn value_bytes(f: &mut File,
                        count: usize,
-                       byte_order: &byte_orders::ByteOrder,
+                       byte_order: &byte_order::ByteOrder,
                        value_offset: u32)
                        -> Vec<u8> {
 
@@ -154,6 +172,27 @@ impl IFDEntry {
         }
     }
 
+    pub fn string_value(&self) -> String {
+        match self.field_type.name.as_ref() {
+            "ASCII" => self.ascii_value().unwrap(),
+            "LONG" => vec_to_string(&self.long_values().unwrap()),
+            "SHORT" => vec_to_string(&self.short_values().unwrap()),
+            _ => IFDEntry::format_bytes(&self.value_bytes),
+        }
+    }
+
+    fn format_bytes(bytes: &Vec<u8>) -> String {
+        let mut hex_form = String::new();
+
+        for byte in (*bytes).iter().take(20) {
+            write!(&mut hex_form, "{:02X} ", byte).unwrap();
+        }
+        if bytes.len() > 30 {
+            write!(&mut hex_form, "(trunacted)").unwrap();
+        }
+        hex_form
+    }
+
     pub fn ascii_value(&self) -> Option<String> {
         if self.field_type.name != String::from("ASCII") {
             return None;
@@ -162,6 +201,24 @@ impl IFDEntry {
             Ok(str) => return Some(str),
             Err(_) => return None,
         }
+    }
+
+    pub fn long_values(&self) -> Option<Vec<u32>> {
+        if self.field_type.name != String::from("LONG") {
+            return None;
+        }
+        let iter = self.value_bytes.chunks(self.field_type.width as usize);
+        let values: Vec<u32> = iter.map(|bytes_arr| self.byte_order.parse_u32(bytes_arr)).collect();
+        return Some(values);
+    }
+
+    pub fn short_values(&self) -> Option<Vec<u16>> {
+        if self.field_type.name != String::from("SHORT") {
+            return None;
+        }
+        let iter = self.value_bytes.chunks(self.field_type.width as usize);
+        let values: Vec<u16> = iter.map(|bytes_arr| self.byte_order.parse_u16(bytes_arr)).collect();
+        return Some(values);
     }
 
     pub fn is_ifd(&self) -> bool {

@@ -5,7 +5,7 @@ use std::io::SeekFrom;
 use std::io::Seek;
 use std::fmt;
 
-use arw_file::byte_orders;
+use arw_file::byte_order;
 
 mod ifd_entry;
 mod tag;
@@ -23,7 +23,7 @@ pub struct IFD {
 impl IFD {
     pub fn new(mut f: &mut File,
                offset: u32,
-               byte_order: &byte_orders::ByteOrder,
+               byte_order: &byte_order::ByteOrder,
                ifd_type: &String)
                -> IFD {
         let mut buf = vec![0; 4];
@@ -74,7 +74,7 @@ impl IFD {
         }
     }
 
-    pub fn sub_ifds(&self, mut f: &mut File, byte_order: &byte_orders::ByteOrder) -> Vec<IFD> {
+    pub fn sub_ifds(&self, mut f: &mut File, byte_order: &byte_order::ByteOrder) -> Vec<IFD> {
         let mut sub_ifds: Vec<IFD> = vec![];
 
         for entry in &self.entries {

@@ -1,8 +1,7 @@
 use std::fs::File;
-use std::fmt::Write;
 mod header;
 mod ifd;
-mod byte_orders;
+mod byte_order;
 
 pub fn pretty_print(filename: &str, header: &header::Header) {
     println!("{} ({}), magic number: {}",
@@ -19,31 +18,15 @@ pub fn pretty_print(filename: &str, header: &header::Header) {
                  ifd.entries_count,
                  ifd.next_ifd_offset);
         for entry in &ifd.entries {
-            let entry_value: String;
-            match entry.ascii_value() {
-                Some(str) => entry_value = str,
-                None => entry_value = format_bytes(&entry.value_bytes),
-            }
             println!("  {} ({:?}, {}): {}",
                      entry.tag,
                      entry.field_type,
                      entry.count,
-                     entry_value);
+                     entry.string_value());
         }
     }
 }
 
-pub fn format_bytes(bytes: &Vec<u8>) -> String {
-    let mut hex_form = String::new();
-
-    for byte in (*bytes).iter().take(30) {
-        write!(&mut hex_form, "{:02X} ", byte).unwrap();
-    }
-    if bytes.len() > 30 {
-        write!(&mut hex_form, "(trunacted)").unwrap();
-    }
-    hex_form
-}
 
 pub fn info(filename: &str) {
     let mut file_handle;

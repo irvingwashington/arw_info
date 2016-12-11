@@ -2,14 +2,14 @@ use std::fs::File;
 use std::io::Read;
 use std::fmt;
 use std::mem;
-use arw_file::byte_orders;
+use arw_file::byte_order;
 use arw_file::ifd;
 
 const BE_MAGIC: u8 = 77;
 const LE_MAGIC: u8 = 73;
 
 pub struct Header {
-    pub byte_order: byte_orders::ByteOrder,
+    pub byte_order: byte_order::ByteOrder,
     // 0-1 The byte order used within the file. Legal values are:
     // II - little endian
     // MM - big endian
@@ -34,9 +34,9 @@ impl Header {
         }
 
         let byte_order = if buf[0] == buf[1] && buf[1] == LE_MAGIC {
-            byte_orders::ByteOrder::LittleEndian
+            byte_order::ByteOrder::LittleEndian
         } else if buf[0] == buf[1] && buf[1] == BE_MAGIC {
-            byte_orders::ByteOrder::BigEndian
+            byte_order::ByteOrder::BigEndian
         } else {
             panic!("Header byte order unknown!");
         };
@@ -68,7 +68,7 @@ impl Header {
 
 impl fmt::Display for Header {
     fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let be_str = if self.byte_order == byte_orders::ByteOrder::LittleEndian {
+        let be_str = if self.byte_order == byte_order::ByteOrder::LittleEndian {
             "LE"
         } else {
             "BE"
