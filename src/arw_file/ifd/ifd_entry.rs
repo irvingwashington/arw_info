@@ -3,7 +3,6 @@ use std::io::Read;
 use std::io::SeekFrom;
 use std::io::Seek;
 use std::collections::HashMap;
-use std::fmt::Write;
 use std::fmt;
 use arw_file::byte_order;
 use arw_file::ifd::tag;
@@ -167,7 +166,6 @@ impl IFDEntry {
             _ => format::format_bytes(&self.value_bytes),
         }
     }
-
 
     pub fn ascii_value(&self) -> Option<String> {
         if self.field_type.name != String::from("ASCII") {

@@ -1,3 +1,4 @@
+use std::fmt::Write;
 use std::fmt;
 
 pub fn vec_to_string<T: fmt::Display>(collection: &Vec<T>) -> String {
