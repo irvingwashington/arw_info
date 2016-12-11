@@ -163,6 +163,8 @@ impl IFDEntry {
             "ASCII" => self.ascii_value().unwrap(),
             "LONG" => format::vec_to_string(&self.long_values().unwrap()),
             "SHORT" => format::vec_to_string(&self.short_values().unwrap()),
+            "SLONG" => format::vec_to_string(&self.signed_long_values().unwrap()),
+            "SSHORT" => format::vec_to_string(&self.signed_short_values().unwrap()),
             _ => format::format_bytes(&self.value_bytes),
         }
     }
@@ -192,6 +194,24 @@ impl IFDEntry {
         }
         let iter = self.value_bytes.chunks(self.field_type.width as usize);
         let values: Vec<u16> = iter.map(|bytes_arr| self.byte_order.parse_u16(bytes_arr)).collect();
+        return Some(values);
+    }
+
+    pub fn signed_long_values(&self) -> Option<Vec<i32>> {
+        if self.field_type.name != String::from("SLONG") {
+            return None;
+        }
+        let iter = self.value_bytes.chunks(self.field_type.width as usize);
+        let values: Vec<i32> = iter.map(|bytes_arr| self.byte_order.parse_i32(bytes_arr)).collect();
+        return Some(values);
+    }
+
+    pub fn signed_short_values(&self) -> Option<Vec<i16>> {
+        if self.field_type.name != String::from("SSHORT") {
+            return None;
+        }
+        let iter = self.value_bytes.chunks(self.field_type.width as usize);
+        let values: Vec<i16> = iter.map(|bytes_arr| self.byte_order.parse_i16(bytes_arr)).collect();
         return Some(values);
     }
 

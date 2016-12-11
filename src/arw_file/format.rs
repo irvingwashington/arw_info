@@ -2,7 +2,9 @@ use std::fmt::Write;
 use std::fmt;
 
 pub fn vec_to_string<T: fmt::Display>(collection: &Vec<T>) -> String {
-    let mut str_form = String::from("[");
+    let mut str_form = String::new();
+
+    if collection.len() > 1 { write!(&mut str_form, "["); };
 
     let mut first = true;
 
@@ -13,7 +15,7 @@ pub fn vec_to_string<T: fmt::Display>(collection: &Vec<T>) -> String {
         write!(&mut str_form, "{}", elem);
         first = false;
     }
-    write!(&mut str_form, "]");
+    if collection.len() > 1 { write!(&mut str_form, "]"); };
     str_form
 }
 
