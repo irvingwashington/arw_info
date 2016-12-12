@@ -6,3 +6,4 @@ authors = ["Maciek Dubinski <maciek@dubinski.net>"]
 [dependencies]
 getopts = "0.2.4"
 lazy_static = "*"
+num = "0.1"

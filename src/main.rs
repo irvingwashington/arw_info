@@ -1,6 +1,7 @@
 extern crate getopts;
 #[macro_use]
 extern crate lazy_static;
+extern crate num;
 
 use getopts::Options;
 use std::env;

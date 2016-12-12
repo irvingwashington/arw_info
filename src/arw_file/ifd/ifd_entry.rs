@@ -4,6 +4,8 @@ use std::io::SeekFrom;
 use std::io::Seek;
 use std::collections::HashMap;
 use std::fmt;
+use num::rational::Rational64;
+
 use arw_file::byte_order;
 use arw_file::ifd::tag;
 
@@ -167,6 +169,8 @@ impl IFDEntry {
             "SHORT" => format::vec_to_string(&self.short_values().unwrap()),
             "SLONG" => format::vec_to_string(&self.signed_long_values().unwrap()),
             "SSHORT" => format::vec_to_string(&self.signed_short_values().unwrap()),
+            "RATIONAL" => format::vec_to_string(&self.rational_values().unwrap()),
+            "SRATIONAL" => format::vec_to_string(&self.signed_rational_values().unwrap()),
             _ => format::format_bytes(&self.value_bytes),
         }
     }
@@ -214,6 +218,38 @@ impl IFDEntry {
         }
         let iter = self.value_bytes.chunks(self.field_type.width as usize);
         let values: Vec<i16> = iter.map(|bytes_arr| self.byte_order.parse_i16(bytes_arr)).collect();
+        return Some(values);
+    }
+
+    pub fn rational_values(&self) -> Option<Vec<Rational64>> {
+        if self.field_type.name != String::from("RATIONAL") {
+            return None;
+        }
+        let iter = self.value_bytes.chunks(self.field_type.width as usize);
+
+        let values: Vec<Rational64> = iter.map(|bytes_arr| {
+                let num = self.byte_order.parse_u32(&bytes_arr[0..4]);
+                let denom = self.byte_order.parse_u32(&bytes_arr[4..8]);
+                Rational64::new(num as i64, denom as i64)
+            })
+            .collect();
+
+        return Some(values);
+    }
+
+    pub fn signed_rational_values(&self) -> Option<Vec<Rational64>> {
+        if self.field_type.name != String::from("SRATIONAL") {
+            return None;
+        }
+        let iter = self.value_bytes.chunks(self.field_type.width as usize);
+
+        let values: Vec<Rational64> = iter.map(|bytes_arr| {
+                let num = self.byte_order.parse_i32(&bytes_arr[0..4]);
+                let denom = self.byte_order.parse_i32(&bytes_arr[4..8]);
+                Rational64::new(num as i64, denom as i64)
+            })
+            .collect();
+
         return Some(values);
     }
 
