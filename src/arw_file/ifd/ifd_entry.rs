@@ -134,7 +134,9 @@ impl IFDEntry {
         let mut buf = vec![0; count];
         if count <= 4 {
             // Fill buffer from value field
-            return byte_order.u32_to_slice(value_offset).to_vec();
+            let mut values = byte_order.u32_to_slice(value_offset).to_vec();
+            values.truncate(count);
+            return values;
         } else {
             //
             match (*f).seek(SeekFrom::Start(value_offset as u64)) {
