@@ -3,7 +3,6 @@ use std::fs::File;
 use std::io::Read;
 use std::io::SeekFrom;
 use std::io::Seek;
-use std::fmt;
 
 use arw_file::byte_order;
 
@@ -19,6 +18,11 @@ pub struct IFD {
     pub next_ifd_offset: u32, // u32 next ifd offset or 0
     pub ifd_type: String,
     pub offset: u32,
+}
+
+pub struct IFDTuple {
+    pub offset: u32,
+    pub tag_label: String,
 }
 
 impl IFD {
@@ -81,37 +85,22 @@ impl IFD {
             entries: entries,
             next_ifd_offset: next_ifd_offset,
             ifd_type: ifd_type.clone(),
-            offset: offset
+            offset: offset,
         }
     }
 
-    pub fn sub_ifds(&self, mut f: &mut File, byte_order: &byte_order::ByteOrder) -> Vec<IFD> {
-        let mut sub_ifds: Vec<IFD> = vec![];
+    pub fn sub_ifd_offsets(&self) -> Vec<IFDTuple> {
+        let mut sub_ifd_offsets: Vec<IFDTuple> = vec![];
 
         for entry in &self.entries {
             if entry.is_ifd() {
-                let ifd = IFD::new(f, entry.value_offset, byte_order, &entry.tag.label);
-
-                for sub_ifd in ifd.sub_ifds(f, byte_order) {
-                    sub_ifds.push(sub_ifd);
-                }
-
-                sub_ifds.push(ifd);
+                sub_ifd_offsets.push(IFDTuple {
+                    offset: entry.value_offset,
+                    tag_label: entry.tag.label.clone(),
+                });
             }
-        } // TODO: Follow-up with next_ifd_offset
+        }
 
-        sub_ifds
-    }
-}
-
-impl fmt::Display for IFD {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        write!(f,
-               "(ArwFile::IFD entries_count: {}, entries num: {}, next_ifd_offset: {}, entries: \
-                {:?})",
-               self.entries_count,
-               self.entries.len(),
-               self.next_ifd_offset,
-               self.entries)
+        sub_ifd_offsets
     }
 }

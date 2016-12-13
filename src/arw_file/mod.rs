@@ -9,7 +9,9 @@ pub fn pretty_print(filename: &str, header: &header::Header) {
              filename,
              header.byte_order.to_str(),
              header.magic_number);
-    println!("IFDs count: {}", header.ifds.len());
+    println!("IFDs count: {}, first IFD offset: {}",
+             header.ifds.len(),
+             header.ifd_offset);
 
     for i in 0..header.ifds.len() {
         let ref ifd = header.ifds[i];
@@ -28,7 +30,6 @@ pub fn pretty_print(filename: &str, header: &header::Header) {
         }
     }
 }
-
 
 pub fn info(filename: &str) {
     let mut file_handle;

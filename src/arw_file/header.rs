@@ -1,20 +1,17 @@
 use std::fs::File;
 use std::io::Read;
-use std::fmt;
 use std::mem;
 use arw_file::byte_order;
 use arw_file::ifd;
+use arw_file::ifd::IFDTuple;
 
 const BE_MAGIC: u8 = 77;
 const LE_MAGIC: u8 = 73;
 
 pub struct Header {
     pub byte_order: byte_order::ByteOrder,
-    // 0-1 The byte order used within the file. Legal values are:
-    // II - little endian
-    // MM - big endian
     pub magic_number: u16,
-    ifd_offset: u32, // 4-7 the offset of the first IFD
+    pub ifd_offset: u32,
     pub ifds: Vec<ifd::IFD>,
 }
 
@@ -44,16 +41,31 @@ impl Header {
         let magic_number = byte_order.parse_u16(&buf[2..4]);
         let ifd_offset = byte_order.parse_u32(&buf[4..8]);
 
-        let mut next_ifd_offset = ifd_offset;
+        let mut offsets: Vec<IFDTuple> = vec![IFDTuple {
+                                                  offset: ifd_offset,
+                                                  tag_label: String::from("Main"),
+                                              }];
         let mut ifds: Vec<ifd::IFD> = vec![];
 
-        while next_ifd_offset != 0 {
-            let ifd = ifd::IFD::new(f, next_ifd_offset, &byte_order, &String::from("Main"));
-            next_ifd_offset = ifd.next_ifd_offset;
-            let sub_ifds = ifd.sub_ifds(f, &byte_order);
-            ifds.push(ifd);
-            for sub_ifd in sub_ifds {
-                ifds.push(sub_ifd);
+        while !offsets.is_empty() {
+            let taken_offsets: Vec<IFDTuple> = offsets.drain(0..).collect();
+
+            for IFDTuple { offset, tag_label } in taken_offsets {
+                let ifd = ifd::IFD::new(f, offset, &byte_order, &tag_label);
+
+                for sub_ifd_tuple in ifd.sub_ifd_offsets() {
+                    if sub_ifd_tuple.offset != 0 {
+                        offsets.push(sub_ifd_tuple)
+                    }
+                }
+
+                if ifd.next_ifd_offset != 0 {
+                    offsets.push(IFDTuple {
+                        offset: ifd.next_ifd_offset,
+                        tag_label: tag_label,
+                    })
+                }
+                ifds.push(ifd);
             }
         }
 
@@ -63,25 +75,5 @@ impl Header {
             ifd_offset: ifd_offset,
             ifds: ifds,
         }
-    }
-}
-
-impl fmt::Display for Header {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let be_str = if self.byte_order == byte_order::ByteOrder::LittleEndian {
-            "LE"
-        } else {
-            "BE"
-        };
-        let mut res: fmt::Result;
-        res = write!(f,
-                     "(ArwFile::Header byte_order: {}, magic number: {}, ifd_offset: {})",
-                     be_str,
-                     self.magic_number,
-                     self.ifd_offset);
-        for ifd in &self.ifds {
-            res = write!(f, "\n {}", ifd);
-        }
-        res
     }
 }

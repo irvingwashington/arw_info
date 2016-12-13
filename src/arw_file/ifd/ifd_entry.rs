@@ -257,21 +257,3 @@ impl IFDEntry {
         self.tag.ifd || self.tag.label == String::from("MakerNote")
     }
 }
-
-impl fmt::Debug for IFDEntry {
-    fn fmt(&self, f: &mut fmt::Formatter) -> fmt::Result {
-        let ascii_value = match self.ascii_value() {
-            Some(str) => str,
-            None => String::from("-"),
-        };
-
-        write!(f,
-               "(ArwFile::IFDEntry tag: {}, field_type: {:?}, count: {}, value_offset: {}, \
-                ascii_value: {})",
-               self.tag,
-               self.field_type,
-               self.count,
-               self.value_offset,
-               ascii_value)
-    }
-}

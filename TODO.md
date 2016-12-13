@@ -14,4 +14,3 @@
   - signed rational (x)
   - float ( )
   - double ( )
-- Merge ifd parsing and subifd parsing into unified logic
