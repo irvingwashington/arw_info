@@ -13,10 +13,11 @@ pub fn pretty_print(filename: &str, header: &header::Header) {
 
     for i in 0..header.ifds.len() {
         let ref ifd = header.ifds[i];
-        println!("\nIFD {} ({}), entries: {}, next_offset: {} ",
+        println!("\nIFD {} ({}), entries: {}, offset: {}, next_offset: {} ",
                  i + 1,
                  ifd.ifd_type,
                  ifd.entries_count,
+                 ifd.offset,
                  ifd.next_ifd_offset);
         for entry in &ifd.entries {
             println!("  {} ({:?}, {}): {}",

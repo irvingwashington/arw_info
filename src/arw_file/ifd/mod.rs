@@ -18,6 +18,7 @@ pub struct IFD {
     pub entries: Vec<IFDEntry>, // 12b x entries_count entries
     pub next_ifd_offset: u32, // u32 next ifd offset or 0
     pub ifd_type: String,
+    pub offset: u32,
 }
 
 impl IFD {
@@ -56,6 +57,15 @@ impl IFD {
             ifd_entry_offset += 12;
         }
 
+        match (*f).seek(SeekFrom::Start(ifd_entry_offset as u64)) {
+            Ok(position) => {
+                if position != (ifd_entry_offset as u64) {
+                    panic!("Error, can't seek to the offset")
+                }
+            }
+            Err(e) => panic!("Error: {}", e),
+        }
+
         match (*f).read(&mut buf) {
             Ok(n) => {
                 if n < 4 {
@@ -71,6 +81,7 @@ impl IFD {
             entries: entries,
             next_ifd_offset: next_ifd_offset,
             ifd_type: ifd_type.clone(),
+            offset: offset
         }
     }
 
